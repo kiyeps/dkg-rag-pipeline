@@ -63,3 +63,22 @@ node --test test/*.test.js
 ## License
 
 Apache-2.0
+
+## Verified example (2026-08-22)
+
+Real ingest + retrieval against the local DKG node (v10.0.13, testnet):
+
+```bash
+dkg-rag ingest /tmp/rag/sample.md
+# {"kaName": "dkg-rag-mt4arb4z-xqid", "chunks": 1, "redactedCount": 0}
+
+dkg-rag query "Torch refund reserve corruption"
+# [0.5489] dkg://openclaw-curator/dkg-rag-mt4arb4z-xqid — /tmp/rag/sample.md (chunk 0/1)
+#   # Torch Finance Audit Summary (2026-08-22)
+#   TORCH-1 was hypothesized as a refunded-pool-operation reserve corruption bug.
+#   ...
+```
+
+A document was chunked, embedded, stored as a Knowledge Asset, and retrieved
+by a natural-language query with a similarity score and a `dkg://` provenance
+URI pointing back at the source asset.
