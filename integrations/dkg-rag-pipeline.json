@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "slug": "dkg-rag-pipeline",
+  "name": "DKG RAG Pipeline",
+  "description": "RAG pipeline using DKG V10 Working/Shared Memory as vector-searchable retrieval source with provenance citations. Ingests documents as Knowledge Assets, indexes with local embeddings, and serves ranked chunks to any LLM for grounded generation.",
+  "category": ["infra", "rag"],
+  "maintainer": {
+    "github": "@kiyeps",
+    "name": "kiyeps",
+    "contact": "https://github.com/kiyeps"
+  },
+  "repo": "https://github.com/kiyeps/dkg-rag-pipeline",
+  "commit": "c786ae32f11a815e25823f9257908aebf72ae0d4",
+  "license": "Apache-2.0",
+  "requiresDkgNodeVersion": ">=10.0.0",
+  "memoryLayers": ["WM", "SWM"],
+  "v10PrimitivesUsed": ["ContextGraph", "KnowledgeAsset", "SubGraph"],
+  "publicInterfacesUsed": ["http-api"],
+  "targetAgents": ["generic-CLI", "OpenClaw", "Hermes"],
+  "install": {
+    "kind": "cli",
+    "package": "dkg-rag-pipeline",
+    "version": "0.1.0",
+    "binary": "dkg-rag",
+    "usageHint": "dkg-rag ingest <file> && dkg-rag query <text> && dkg-rag serve"
+  },
+  "security": {
+    "writeAuthority": ["wm/write", "swm/share"],
+    "networkEgress": ["http://127.0.0.1:9200"],
+    "notes": "Local embedding fallback (character n-gram TF vector) — no external API required. Secret redaction gate scans all text and quads before WM write. Auth token read from ~/.dkg/auth.token."
+  },
+  "trustTier": "community",
+  "promotionPath": "Chunks ingested to WM as provenance-tagged Knowledge Assets. Frequently retrieved chunks can be promoted to SWM (sealed) via swm/share, making them available as Verified Memory candidates for downstream oracle consumption.",
+  "fitNotes": "WM/SWM as RAG retrieval source directly serves the LLM-Wiki/Autoresearch theme. Distinct from OpenClaw memory curator (agent-specific daemon), DKG Memory MCP server (transport layer), and Hermes bridge (agent audit trail). This is an infra/retrieval layer usable by any agent or application."
+}

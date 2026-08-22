@@ -1,0 +1,13 @@
+{
+  "name": "dkg-rag-pipeline",
+  "version": "0.1.0",
+  "description": "RAG pipeline using DKG V10 Working/Shared Memory as vector-searchable retrieval source",
+  "type": "module",
+  "bin": {
+    "dkg-rag": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "license": "Apache-2.0"
+}
