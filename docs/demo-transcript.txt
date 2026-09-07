@@ -1,0 +1,8 @@
+$ dkg-rag query "Base Sepolia testnet context graph"
+[0.5714] dkg://openclaw-curator/dkg-rag-mtrozsqn-or9q — /tmp/f1post/demo_doc.md (chunk 0/1)
+  # DKG RAG Pipeline Demo
+
+This document demonstrates the DKG RAG pipeline against a live local DKG V10 node.
+
+Key fact: the OriginTrail DKG V10 node in this demo runs on Base Sepolia testnet with conte...
+
