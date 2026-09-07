@@ -38,12 +38,37 @@ async function cmdServe(port = 8787) {
   const pipeline = new Pipeline();
   pipeline.index.load();
 
+  // Safe defaults: loopback-only bind, same-origin-ish CORS, no auth needed on loopback.
+  // Remote exposure is explicit opt-in and requires a bearer token.
+  const host = process.env.DKG_RAG_HOST || '127.0.0.1';
+  const token = process.env.DKG_RAG_TOKEN || '';
+  const exposed = host !== '127.0.0.1' && host !== 'localhost' && host !== '::1';
+  if (exposed && !token) {
+    console.error('Refusing to bind a non-loopback address without DKG_RAG_TOKEN set.');
+    process.exit(1);
+  }
+
   const server = createServer(async (req, res) => {
-    // CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // CORS: no wildcard. On loopback we reflect nothing (same-origin clients need no CORS);
+    // in explicit exposed mode, reflect the Origin only if DKG_RAG_CORS_ORIGIN matches it.
+    const origin = req.headers.origin;
+    if (exposed && process.env.DKG_RAG_CORS_ORIGIN && origin === process.env.DKG_RAG_CORS_ORIGIN) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
+
+    // Auth: required only in explicitly exposed mode.
+    if (exposed) {
+      const auth = req.headers.authorization || '';
+      if (auth !== `Bearer ${token}`) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'unauthorized' }));
+        return;
+      }
+    }
 
     if (req.method === 'GET' && req.url === '/health') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -59,7 +84,8 @@ async function cmdServe(port = 8787) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ results }));
       } catch (err) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
+        const code = err.statusCode || 400;
+        res.writeHead(code, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err.message }));
       }
       return;
@@ -86,7 +112,8 @@ async function cmdServe(port = 8787) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(result));
       } catch (err) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
+        const code = err.statusCode || 400;
+        res.writeHead(code, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err.message }));
       }
       return;
@@ -96,20 +123,37 @@ async function cmdServe(port = 8787) {
     res.end(JSON.stringify({ error: 'not found' }));
   });
 
-  server.listen(port, () => {
-    console.log(`dkg-rag serving on http://127.0.0.1:${port}`);
+  server.listen(port, host, () => {
+    const shown = host === '127.0.0.1' || host === '::1' ? `http://127.0.0.1:${port}` : `http://${host}:${port}`;
+    console.log(`dkg-rag serving on ${shown} (bind: ${host})`);
+    if (exposed) console.log('  mode: EXPOSED — bearer token required');
     console.log(`  GET  /health`);
     console.log(`  POST /retrieve  { "query": "...", "k": 5 }`);
     console.log(`  POST /generate  { "query": "...", "k": 5 }`);
   });
 }
 
+const MAX_BODY_BYTES = parseInt(process.env.DKG_RAG_MAX_BODY || '1048576', 10); // 1 MiB default
+
 function readBody(req) {
   return new Promise((resolve, reject) => {
-    let data = '';
-    req.on('data', c => { data += c; });
-    req.on('end', () => resolve(data));
-    req.on('error', reject);
+    // Enforce the limit on the raw byte stream BEFORE any buffering/parse.
+    let size = 0;
+    const chunks = [];
+    let aborted = false;
+    req.on('data', c => {
+      if (aborted) return;
+      size += c.length;
+      if (size > MAX_BODY_BYTES) {
+        aborted = true;
+        req.removeAllListeners('data');
+        reject(Object.assign(new Error(`request body exceeds ${MAX_BODY_BYTES} bytes`), { statusCode: 413 }));
+        return;
+      }
+      chunks.push(c);
+    });
+    req.on('end', () => { if (!aborted) resolve(Buffer.concat(chunks).toString('utf8')); });
+    req.on('error', err => { if (!aborted) reject(err); });
   });
 }
 
