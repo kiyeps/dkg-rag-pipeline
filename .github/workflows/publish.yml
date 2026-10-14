@@ -1,0 +1,54 @@
+name: Publish with provenance
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      # No dependencies to install: the package uses only Node built-ins.
+      # Keeping this explicit documents that the published tarball is
+      # dependency-free and that no install scripts run at publish time.
+      - name: Verify no install scripts
+        run: |
+          node -e "
+          const p = require('./package.json');
+          const bad = ['preinstall','install','postinstall','prepare'].filter(k => p.scripts && p.scripts[k]);
+          if (bad.length) { console.error('Install scripts present: ' + bad.join(', ')); process.exit(1); }
+          console.log('No install scripts - OK');
+          "
+
+      - name: Verify LICENSE present
+        run: |
+          test -f LICENSE || { echo 'LICENSE missing'; exit 1; }
+          node -e "
+          const p = require('./package.json');
+          if (!p.license) { console.error('package.json has no license field'); process.exit(1); }
+          console.log('license field: ' + p.license);
+          "
+          head -2 LICENSE | grep -q 'Apache License' || { echo 'LICENSE is not Apache 2.0'; exit 1; }
+
+      - name: Run tests
+        run: npm test
+
+      - name: Audit production deps
+        run: npm audit --production || true
+
+      - name: Publish with provenance
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
