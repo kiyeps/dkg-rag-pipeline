@@ -1,8 +1,38 @@
-$ dkg-rag query "Base Sepolia testnet context graph"
-[0.5714] dkg://openclaw-curator/dkg-rag-mtrozsqn-or9q — /tmp/f1post/demo_doc.md (chunk 0/1)
+DKG RAG Pipeline - live demo transcript
+Recorded against a live local DKG V10 node (IRONCLAW, Base Sepolia testnet,
+context graph: openclaw-curator) on 2026-10-15. Run from the repo root.
+
+$ node src/cli.js ingest /tmp/ragdemo/demo_doc.md
+{
+  "kaName": "dkg-rag-mv8nblhw-4lq3",
+  "assertionUri": "did:dkg:context-graph:openclaw-curator/assertion/0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A/dkg-rag-mv8nblhw-4lq3",
+  "chunks": 2,
+  "redactedCount": 0,
+  "contextGraphId": "openclaw-curator"
+}
+
+$ node src/cli.js query "Base Sepolia testnet context graph"
+[0.4601] did:dkg:context-graph:openclaw-curator/assertion/0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A/dkg-rag-mv8nblhw-4lq3 - /tmp/ragdemo/demo_doc.md (chunk 0/2)
   # DKG RAG Pipeline Demo
 
 This document demonstrates the DKG RAG pipeline against a live local DKG V10 node.
 
-Key fact: the OriginTrail DKG V10 node in this demo runs on Base Sepolia testnet with conte...
+Key fact: the OriginTrail DKG V10 node in this demo runs on Base Sepolia testnet
+with conte...
 
+[0.3397] did:dkg:context-graph:openclaw-curator/assertion/0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A/dkg-rag-mv8nblhw-4lq3 - /tmp/ragdemo/demo_doc.md (chunk 1/2)
+  
+
+The pipeline itself has zero runtime dependencies and defaults to a fully local
+embedding provider (character n-gram TF vector); no external API keys are needed.
+
+
+
+$ node src/cli.js share dkg-rag-mv8nblhw-4lq3
+{
+  "swmShared": true,
+  "promotedCount": 8,
+  "sealed": true,
+  "publishReady": true,
+  "shareOperationId": "mv8nbn6o-4v0t3f"
+}

@@ -76,7 +76,7 @@ export class DkgClient {
 
   // POST /api/knowledge-assets/{name}/swm/share — share to SWM
   async shareSWM(name, { entities = 'all' } = {}) {
-    return this._request('POST', `/api/knowledge-assets/${encodeURIComponent(name)}/swm/share`, { entities });
+    return this._request('POST', `/api/knowledge-assets/${encodeURIComponent(name)}/swm/share`, { entities, contextGraphId: this.contextGraphId });
   }
 
   // POST /api/query — SPARQL query; view = 'working-memory' | 'shared-working-memory' | 'verifiable-memory'
