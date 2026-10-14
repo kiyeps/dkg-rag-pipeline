@@ -4,6 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { validateEndpointUrl } from './net-guard.js';
 
 const DEFAULT_BASE = 'http://127.0.0.1:9200';
 
@@ -17,7 +18,13 @@ function loadToken(tokenPath) {
 
 export class DkgClient {
   constructor({ baseUrl, tokenPath, token, contextGraphId } = {}) {
-    this.baseUrl = (baseUrl || process.env.DKG_API_URL || DEFAULT_BASE).replace(/\/+$/, '');
+    // Validate and normalize before any request: the DKG bearer token must
+    // never be sent to an unexpected origin. Non-loopback endpoints require
+    // https plus the explicit DKG_ALLOW_REMOTE_ENDPOINT=1 operator opt-in.
+    this.baseUrl = validateEndpointUrl(baseUrl || process.env.DKG_API_URL || DEFAULT_BASE, {
+      name: 'DKG_API_URL',
+      remoteOptInEnv: 'DKG_ALLOW_REMOTE_ENDPOINT',
+    });
     this.token = token || loadToken(tokenPath);
     this.contextGraphId = contextGraphId || process.env.DKG_CONTEXT_GRAPH_ID || 'openclaw-curator';
   }
@@ -55,6 +62,14 @@ export class DkgClient {
   async writeWM(name, quads) {
     return this._request('POST', `/api/knowledge-assets/${encodeURIComponent(name)}/wm/write`, {
       quads,
+      contextGraphId: this.contextGraphId
+    });
+  }
+
+  // POST /api/knowledge-assets/{name}/wm/finalize - seal the WM assertion and
+  // receive the canonical node-issued assertion URI.
+  async finalizeWM(name) {
+    return this._request('POST', `/api/knowledge-assets/${encodeURIComponent(name)}/wm/finalize`, {
       contextGraphId: this.contextGraphId
     });
   }

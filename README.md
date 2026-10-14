@@ -6,7 +6,7 @@ Retrieval-Augmented Generation pipeline using DKG V10 Working/Shared Memory as a
 
 1. **Ingest** — chunk documents, write each chunk as a provenance-tagged Knowledge Asset to DKG WM
 2. **Index** — compute embeddings per chunk; store the embedding + pointer to the DKG KA (local cosine index, no external vector DB)
-3. **Retrieve** — embed a query, rank chunks by similarity, return top-k with DKG KA UALs as citations
+3. **Retrieve** — embed a query, rank chunks by similarity, return top-k with the node-issued assertion URIs as citations
 4. **Generate** — feed retrieved chunks to a pluggable LLM with DKG provenance as grounding
 
 ## Quick start
@@ -66,7 +66,7 @@ Apache-2.0
 
 ## Verified example (2026-08-22)
 
-Real ingest + retrieval against the local DKG node (v10.0.13, testnet):
+Real ingest + retrieval against the local DKG node (v10.0.19, testnet):
 
 ```bash
 dkg-rag ingest /tmp/rag/sample.md

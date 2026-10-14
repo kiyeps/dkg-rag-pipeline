@@ -3,6 +3,8 @@
 // Optional: OpenAI-compatible provider via env (EMBEDDING_API_URL, EMBEDDING_API_KEY, EMBEDDING_MODEL).
 
 import { createHash } from 'node:crypto';
+import { redact } from './redaction.js';
+import { validateEndpointUrl } from './net-guard.js';
 
 const DIMENSION = 128;
 const N = 3; // character trigrams
@@ -54,7 +56,9 @@ export class OpenAICompatibleEmbeddingProvider {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.apiKey}`,
       },
-      body: JSON.stringify({ input: text, model: this.model }),
+      // Defense in depth: redact secret-shaped spans before any text
+      // leaves the process toward an external provider.
+      body: JSON.stringify({ input: redact(text).text, model: this.model }),
     });
     if (!res.ok) throw new Error(`Embedding API ${res.status}: ${await res.text()}`);
     const data = await res.json();
@@ -72,7 +76,9 @@ export function createProvider() {
   const apiKey = process.env.EMBEDDING_API_KEY;
   const model = process.env.EMBEDDING_MODEL;
   if (apiUrl && apiKey && model) {
-    return new OpenAICompatibleEmbeddingProvider({ apiUrl, apiKey, model });
+    // Normalize + validate: non-loopback providers must be https.
+    const normalized = validateEndpointUrl(apiUrl, { name: 'EMBEDDING_API_URL' });
+    return new OpenAICompatibleEmbeddingProvider({ apiUrl: normalized, apiKey, model });
   }
   return new LocalEmbeddingProvider();
 }
