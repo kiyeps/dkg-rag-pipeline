@@ -13,7 +13,7 @@
     "contact": "https://github.com/kiyeps"
   },
   "repo": "https://github.com/kiyeps/dkg-rag-pipeline",
-  "commit": "fbe70c9637a5e37ce64dc6ed753232f6401329cb",
+  "commit": "fdb17f650039cc918f8290c12116435f0e46f950",
   "license": "Apache-2.0",
   "requiresDkgNodeVersion": ">=10.0.0",
   "memoryLayers": [
