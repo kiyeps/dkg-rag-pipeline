@@ -1,48 +1,59 @@
 DKG V10 Round-1 submission: dkg-rag-pipeline
-Live demo transcript, recorded 2026-10-15 (Asia/Jakarta) against a live local DKG V10 node.
+Recorded walkthrough transcript, generated 2026-10-15 13:12 WIB
+
+This file is the exact terminal output of the recorded run shipped in
+docs/demo.gif (raw recording: docs/demo.cast, asciinema v2 format).
+One run produced all three artefacts: the GIF, the cast and this transcript.
 
 Environment
-  node: IRONCLAW (codename Superagent V7) v10.0.19, edge node, Base Sepolia testnet
+  node: IRONCLAW v10.0.19 (edge node, DKG V10 Base Testnet / Base Sepolia)
+  node endpoint: http://127.0.0.1:9200 (auth token: ~/.dkg/auth.token, line 2)
   context graph: openclaw-curator
-  repo revision: fdb17f650039cc918f8290c12116435f0e46f950
-  demo corpus: /home/chovy/rag-demo-corpus/demo_doc_20261015.md
+  demo input: /home/chovy/rag-demo-corpus/demo_doc_20261015.md
+  recorded: 2026-10-15 13:12 WIB
 
-Every command and response below is verbatim output from this run.
+Command output
 
-$ node src/cli.js ingest /home/chovy/rag-demo-corpus/demo_doc_20261015.md
+[?2004h$ cd /home/chovy/dkg-rag-pipeline
+[?2004l
+[?2004h$ echo "=== dkg-rag-pipeline live walkthrough vs DKG V10 node ==="
+[?2004l
+=== dkg-rag-pipeline live walkthrough vs DKG V10 node ===
+[?2004h$ node src/cli.js ingest /home/chovy/rag-demo-corpus/demo_doc_20261015.md | tee /tmp/rag_last_ingest.json
+[?2004l
 {
-  "kaName": "dkg-rag-mv9209xr-4tef",
-  "assertionUri": "did:dkg:context-graph:openclaw-curator/assertion/0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A/dkg-rag-mv9209xr-4tef",
+  "kaName": "dkg-rag-mv950qvh-6mfa",
+  "assertionUri": "did:dkg:context-graph:openclaw-curator/assertion/0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A/dkg-rag-mv950qvh-6mfa",
   "chunks": 2,
   "redactedCount": 0,
   "contextGraphId": "openclaw-curator"
 }
-
-$ node src/cli.js query "Base Sepolia testnet context graph"
-[0.4625] did:dkg:context-graph:openclaw-curator/assertion/0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A/dkg-rag-mv9209xr-4tef - /home/chovy/rag-demo-corpus/demo_doc_20261015.md (chunk 0/2)
+[?2004h$ KA=$(grep -oE 'dkg-rag-[a-z0-9-]+' /tmp/rag_last_ingest.json | head -1); echo "KA_NAME=$KA"
+[?2004l
+KA_NAME=dkg-rag-mv950qvh-6mfa
+[?2004h$ node src/cli.js query "Base Sepolia testnet context graph"
+[?2004l
+[0.4625] did:dkg:context-graph:openclaw-curator/assertion/0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A/dkg-rag-mv950qvh-6mfa - /home/chovy/rag-demo-corpus/demo_doc_20261015.md (chunk 0/2)
   # DKG RAG Pipeline Demo 2026-10-15
 
 This document demonstrates the DKG RAG pipeline against a live local DKG V10 node.
 
 Key fact: the OriginTrail DKG V10 node in this demo runs on Base Sepolia testnet...
 
-[0.3392] did:dkg:context-graph:openclaw-curator/assertion/0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A/dkg-rag-mv9209xr-4tef - /home/chovy/rag-demo-corpus/demo_doc_20261015.md (chunk 1/2)
+[0.3392] did:dkg:context-graph:openclaw-curator/assertion/0xebDc3D25487E5B28bbd5eD4d5cF59A9c7c46395A/dkg-rag-mv950qvh-6mfa - /home/chovy/rag-demo-corpus/demo_doc_20261015.md (chunk 1/2)
   y citation.
 
 The pipeline itself has zero runtime dependencies and defaults to a fully local
 embedding provider (character n-gram TF vector); no external API keys are needed.
 
-$ node src/cli.js share dkg-rag-mv9209xr-4tef
+
+[?2004h$ node src/cli.js share "$KA"
+[?2004l
 {
   "swmShared": true,
   "promotedCount": 8,
   "sealed": true,
   "publishReady": true,
-  "shareOperationId": "mv920nl4-4z1ktq"
+  "shareOperationId": "mv950vnu-ff9ohk"
 }
-
-Notes
-  - The citation string is the node-issued assertion URI returned by the node at ingest
-    finalize time (not a client-constructed identifier).
-  - The SWM share step is the regression fixed on 2026-10-15 (the client now sends
-    contextGraphId on /swm/share); this run confirms the fix against the live node.
+[?2004h$ 

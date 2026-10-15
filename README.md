@@ -93,3 +93,12 @@ dkg-rag query "Torch refund reserve corruption"
 A document was chunked, embedded, stored as a Knowledge Asset, and retrieved
 by a natural-language query with a similarity score and a `dkg://` provenance
 URI pointing back at the source asset.
+
+
+## Recorded walkthrough
+
+`docs/demo.gif` is a recorded walkthrough of this integration against a live local
+DKG V10 node (raw recording: `docs/demo.cast`, asciinema v2 format).
+`docs/demo-transcript.txt` is the exact terminal output of that same run.
+
+![recorded walkthrough](docs/demo.gif)
