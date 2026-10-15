@@ -13,7 +13,7 @@
     "contact": "https://github.com/kiyeps"
   },
   "repo": "https://github.com/kiyeps/dkg-rag-pipeline",
-  "commit": "fdb17f650039cc918f8290c12116435f0e46f950",
+  "commit": "4cd96d6ea6be59521efbfa63dd7b20d1f7f444cf",
   "license": "Apache-2.0",
   "requiresDkgNodeVersion": ">=10.0.0",
   "memoryLayers": [
@@ -56,6 +56,6 @@
   "promotionPath": "Ingested documents land in Working Memory as provenance-tagged Knowledge Assets. 'dkg-rag share <ka>' promotes a document to Shared Working Memory (swm/share seals by default, publish-ready). No automatic promotion and no daemon; VM publishing is not implemented in Round 1.",
   "fitNotes": "WM/SWM as RAG retrieval source directly serves the LLM-Wiki/Autoresearch theme. Distinct from OpenClaw memory curator (agent-specific daemon), DKG Memory MCP server (transport layer), and Hermes bridge (agent audit trail). This is an infra/retrieval layer usable by any agent or application.",
   "$schema": "../schema/integration.schema.json",
-  "demo": "https://github.com/kiyeps/dkg-rag-pipeline/blob/main/docs/demo-transcript.txt",
+  "demo": "https://github.com/kiyeps/dkg-rag-pipeline/blob/main/docs/demo.gif",
   "designBrief": "https://github.com/kiyeps/dkg-rag-pipeline/blob/main/docs/DESIGN.md"
 }
