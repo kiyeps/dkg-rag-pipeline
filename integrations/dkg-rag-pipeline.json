@@ -42,13 +42,15 @@
   },
   "security": {
     "writeAuthority": [
-      "wm/write",
-      "swm/share"
+      "POST /api/knowledge-assets",
+      "POST /api/knowledge-assets/{name}/wm/write",
+      "POST /api/knowledge-assets/{name}/wm/finalize",
+      "POST /api/knowledge-assets/{name}/swm/share"
     ],
     "networkEgress": [
-      "http://127.0.0.1:9200"
+      "*"
     ],
-    "notes": "Egress: local DKG node only by default; optional operator-configured embedding/LLM endpoints require https plus explicit opt-in (DKG_ALLOW_REMOTE_ENDPOINT=1). Secret redaction gate scans all text and quads before any write or provider call. Auth token from ~/.dkg/auth.token or env; request bodies capped at 1 MiB (invalid cap values fall back to the documented default). Zero runtime dependencies."
+    "notes": "Egress: no external host by default (local hash-bucket embedding). Declared \"*\" because embedding and generation destinations are operator-configured: EMBEDDING_API_URL (with EMBEDDING_API_KEY/EMBEDDING_MODEL) and LLM_ENDPOINT. Non-loopback destinations must be https; embedding calls additionally require DKG_ALLOW_REMOTE_ENDPOINT=1. The DKG auth token is sent only to the DKG node, never to embedding or LLM endpoints, and prompts are redacted before leaving the process. Secret redaction gate scans all text and quads before any write or provider call. Auth token from ~/.dkg/auth.token or env; request bodies capped at 1 MiB (invalid cap values fall back to the documented default). Zero runtime dependencies."
   },
   "trustTier": "community",
   "promotionPath": "Ingested documents land in Working Memory as provenance-tagged Knowledge Assets. 'dkg-rag share <ka>' promotes a document to Shared Working Memory (swm/share seals by default, publish-ready). No automatic promotion and no daemon; VM publishing is not implemented in Round 1.",

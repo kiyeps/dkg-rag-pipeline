@@ -9,6 +9,17 @@ Retrieval-Augmented Generation pipeline using DKG V10 Working/Shared Memory as a
 3. **Retrieve** — embed a query, rank chunks by similarity, return top-k with the node-issued assertion URIs as citations
 4. **Generate** — feed retrieved chunks to a pluggable LLM with DKG provenance as grounding
 
+## Install
+
+```bash
+npm install -g dkg-rag-pipeline
+# or without installing:
+npx --package dkg-rag-pipeline dkg-rag query "what is distributed knowledge?"
+```
+
+The package ships one executable, `dkg-rag`. The registry entry is
+`integrations/dkg-rag-pipeline.json`.
+
 ## Quick start
 
 ```bash
