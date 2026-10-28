@@ -16,10 +16,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      # npm Trusted Publishing (OIDC) requires npm CLI >= 11.5.1. Node 24 ships
+      # a sufficient npm, so this only upgrades when the bundled version is too
+      # old; it never downgrades.
+      - name: Verify npm CLI >= 11.5.1
+        run: |
+          set -euo pipefail
+          current="$(npm --version)"
+          echo "bundled npm: ${current}"
+          required="11.5.1"
+          if [ "$(printf '%s\n' "$required" "$current" | sort -V | head -n1)" != "$required" ]; then
+            echo "npm ${current} is older than ${required}; upgrading"
+            npm install -g npm@"$required"
+            current="$(npm --version)"
+          fi
+          echo "effective npm: ${current}"
+          if [ "$(printf '%s\n' "$required" "$current" | sort -V | head -n1)" != "$required" ]; then
+            echo "npm ${current} still older than ${required}" >&2
+            exit 1
+          fi
+          echo "npm >= ${required} - OK"
 
       - name: Install (lockfile-pinned, no scripts)
         run: npm ci --ignore-scripts
