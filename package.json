@@ -1,6 +1,6 @@
 {
   "name": "dkg-rag-pipeline",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "RAG pipeline using DKG V10 Working/Shared Memory as vector-searchable retrieval source",
   "type": "module",
   "bin": {
